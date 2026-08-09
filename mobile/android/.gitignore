@@ -1,0 +1,16 @@
+# Gradle wrapper
+gradle-wrapper.jar
+/.gradle
+/captures/
+/gradlew
+/gradlew.bat
+
+# Local config
+/local.properties
+GeneratedPluginRegistrant.java
+.cxx/
+
+# Signing keys
+key.properties
+**/*.keystore
+**/*.jks

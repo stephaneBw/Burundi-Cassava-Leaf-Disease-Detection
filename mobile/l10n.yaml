@@ -1,0 +1,9 @@
+# Configures Flutter localization generation for supported languages.
+
+arb-dir: lib/core/l10n
+template-arb-file: app_en.arb
+output-class: AppLocalizations
+preferred-supported-locales:
+  - en
+  - tr
+output-dir: lib/core/l10n

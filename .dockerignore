@@ -1,0 +1,50 @@
+# Keep the Python ML image context small and reproducible.
+.git/
+.github/
+.venv/
+.venv*/
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+.tmp/
+
+# Python build and quality artifacts
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Large/generated ML data and artifacts
+datasets/
+outputs/
+logs/
+*.keras
+*.h5
+*.hdf5
+*.onnx
+*.tflite
+
+# Flutter/mobile project is validated outside this Python ML image.
+mobile/
+
+# Documentation media and local/editor files
+docs/assets/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+CODEX.md
+
+# Local secrets and environment files
+.env
+.env.*
+.kaggle/
+*.secret
+kaggle.json

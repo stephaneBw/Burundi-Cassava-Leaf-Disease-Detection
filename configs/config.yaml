@@ -1,0 +1,26 @@
+# Defines runtime paths and training hyperparameters for the ML pipeline.
+
+project_name: Burundi_Cassava_Leaf_Disease_Detection          # Stable artifact identifier
+data:
+  raw_path: datasets/raw                                    # Cassava source images
+  split_path: datasets/split                                # Prepared train/val/test images
+  img_size: [224, 224]                                      # Input resolution [H, W]
+  batch_size: 16                                            # Training batch size
+  split_ratio:                                              # Dataset partition ratios
+    train: 0.8                                              # Training set ratio
+    val: 0.1                                                # Validation set ratio
+    test: 0.1                                               # Test set ratio
+  seed: 42                                                  # Reproducibility seed
+  excluded_classes: []                                      # Classes omitted before splitting
+
+model:
+  base_model: MobileNetV3Large                              # Pre-trained backbone architecture
+  learning_rate_stage1: 0.001                               # Initial learning rate
+  learning_rate_stage2: 0.0001                              # Fine-tuning learning rate
+  epochs_stage1: 15                                         # Head training duration
+  epochs_stage2: 30                                         # Fine-tuning duration
+  fine_tune_fraction: 0.3                                   # Fraction of backbone layers unfrozen in stage 2
+  patience: 3                                               # Early stopping patience
+
+defaults:
+  model_path: outputs/model_v1/checkpoints/best_model.keras # Default inference model

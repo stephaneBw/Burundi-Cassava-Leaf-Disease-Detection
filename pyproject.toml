@@ -1,0 +1,116 @@
+# Defines Python package metadata and local quality-tool configuration.
+
+[project]
+name = "plant-disease-edge-ai-diagnosis-system"
+version = "1.0.0"
+description = "Production-ready edge AI pipeline and Flutter mobile application for offline plant disease diagnosis"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    {name = "Mustafa Berat Yavas"}
+]
+dependencies = [
+    "tensorflow>=2.20.0",
+    "keras>=3.12.0",
+    "opencv-python-headless>=4.12.0",
+    "pandas>=2.3.0",
+    "numpy>=2.2.0",
+    "scikit-learn>=1.7.0",
+    "matplotlib>=3.10.0",
+    "seaborn>=0.13.0",
+    "pyyaml>=6.0.0",
+    "tqdm>=4.67.0",
+    "pillow>=12.0.0",
+    "kagglehub>=1.0.0",
+]
+keywords = [
+    "plant-disease-detection",
+    "edge-ai",
+    "tensorflow",
+    "keras",
+    "tensorflow-lite",
+    "flutter",
+    "mobilenetv3",
+    "computer-vision",
+    "smart-agriculture",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Repository = "https://github.com/MustafaBeratYavas/plant-disease-edge-ai-diagnosis-system"
+"Bug Tracker" = "https://github.com/MustafaBeratYavas/plant-disease-edge-ai-diagnosis-system/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0,<10.0.0",
+    "pytest-cov>=4.1.0,<8.0.0",
+    "ruff==0.15.12",
+    "mypy==1.20.2",
+    "pre-commit>=3.6.0,<5.0.0",
+]
+
+[project.scripts]
+plant-train = "src.cli.train:main"
+plant-evaluate = "src.cli.evaluate:main"
+plant-export = "src.cli.export:main"
+plant-infer = "src.cli.inference:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests/unit", "tests/integration"]
+pythonpath = ["."]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-ra --strict-config --strict-markers --tb=short"
+markers = [
+    "integration: tests that touch real datasets, bundled model artifacts, or external runtimes",
+    "unit: fast isolated tests that rely on mocks or temporary files",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["src", "scripts"]
+omit = [
+    "src/**/__init__.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 80
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "C4", "UP"]
+ignore = ["E501", "B008"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.setuptools.packages.find]
+include = ["src*"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

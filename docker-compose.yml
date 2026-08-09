@@ -1,0 +1,14 @@
+services:
+  ml:
+    build:
+      context: .
+    image: plant-disease-edge-ai-ml:local
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    environment:
+      - TF_CPP_MIN_LOG_LEVEL=2
+      - MPLBACKEND=Agg
+      - KAGGLE_USERNAME
+      - KAGGLE_KEY
+    command: make ci-python

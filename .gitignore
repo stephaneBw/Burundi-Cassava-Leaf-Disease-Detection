@@ -1,0 +1,152 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+.Python
+
+# Build artifacts
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+/lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+.venv*/
+.python-version
+
+# IDE settings
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+# Visual Studio
+.vs/
+*.slnx
+
+# Testing cache
+.pytest_cache/
+pytest-cache-files-*/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+junit.xml
+.tox/
+.nox/
+.hypothesis/
+.cache/
+
+# Type checking
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# TensorFlow checkpoints
+checkpoint
+*.ckpt*
+events.out.tfevents.*
+saved_model/
+
+# Dataset storage
+datasets/*
+!datasets/.gitkeep
+!datasets/raw/
+datasets/raw/*
+!datasets/raw/.gitkeep
+!datasets/split/
+datasets/split/*
+!datasets/split/.gitkeep
+
+# Training outputs
+outputs/*
+!outputs/.gitkeep
+logs/*
+!logs/.gitkeep
+*.keras
+*.h5
+*.hdf5
+*.onnx
+*.tflite
+# !mobile/assets/models/best_model_quantized.tflite  (removed so the quantized model is not force-included)
+
+# Flutter dependencies
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/.pub-cache/
+mobile/.pub/
+mobile/build/
+mobile/coverage/
+
+# Flutter generated
+mobile/*.g.dart
+mobile/*.freezed.dart
+mobile/lib/generated/
+
+# iOS build files
+mobile/ios/Pods/
+mobile/ios/.symlinks/
+mobile/ios/Flutter/Flutter.framework
+mobile/ios/Flutter/Flutter.podspec
+mobile/ios/Flutter/Generated.xcconfig
+mobile/ios/Flutter/ephemeral/
+mobile/ios/Flutter/.last_build_id
+mobile/ios/Flutter/app.flx
+mobile/ios/Flutter/app.zip
+mobile/ios/Flutter/flutter_assets/
+mobile/ios/ServiceDefinitions.json
+mobile/ios/Runner/GeneratedPluginRegistrant.*
+
+# Android build files
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/android/**/GeneratedPluginRegistrant.java
+mobile/android/key.properties
+mobile/android/**/*.keystore
+mobile/android/**/*.jks
+
+# macOS system files
+.DS_Store
+*.pem
+
+# Windows system files
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.log
+*.tmp
+*.bak
+.tmp/
+.pytest_tmp*/
+.pytest_verify_tmp/
+.env
+.env.local
+.env.*
+!.env.example
+.kaggle/
+*.secret
+kaggle.json
