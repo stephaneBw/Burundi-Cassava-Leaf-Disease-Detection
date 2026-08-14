@@ -1,4 +1,4 @@
-"""Download and normalize the Kaggle PlantVillage dataset package."""
+"""Download and normalize the Kaggle Cassava Leaf Disease dataset package."""
 
 from __future__ import annotations
 
@@ -7,16 +7,15 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-
 import kagglehub
 
-DEFAULT_DATASET = "mustafaberatyavas/plantvillage-dataset"
-DEFAULT_DOWNLOAD_DIR = Path(".tmp") / "kaggle-plantvillage"
-METADATA_FILES = ("labels.csv", "class_distribution.csv", "dataset_manifest.csv")
+DEFAULT_DATASET = "nirmalsankalana/cassava-leaf-disease-classification"
+DEFAULT_DOWNLOAD_DIR = Path(".tmp") / "kaggle-cassava"
+METADATA_FILES = ("labels.csv", "class_distribution.csv", "dataset_manifest.csv", "train.csv")
 
 
 def dataset_ready(project_root: Path) -> bool:
-    # Treat the dataset as ready only when both raw classes and all splits exist.
+    """Treat the dataset as ready only when both raw classes and all splits exist."""
     raw_dir = project_root / "datasets" / "raw"
     split_dir = project_root / "datasets" / "split"
 
@@ -29,41 +28,37 @@ def dataset_ready(project_root: Path) -> bool:
     )
 
 
-def find_dataset_root(download_path: Path) -> Path:
-    # Support the known Kaggle package layouts without hard-coding one nesting depth.
+def find_raw_folder(download_path: Path) -> Path:
+    """Find the folder containing the 5 disease class subdirectories."""
+    # Check for explicit nested raw subfolders
     candidates = [
-        download_path / "PlantVillage" / "PlantVillage",
-        download_path / "PlantVillage",
-        download_path,
+        download_path / "raw",
+        download_path / "cassava-leaf-disease-classification",
     ]
-
     for candidate in candidates:
-        if (candidate / "raw").is_dir():
+        if candidate.is_dir():
             return candidate
 
-    raise FileNotFoundError(
-        "Could not find a PlantVillage raw directory in the downloaded dataset package."
-    )
+    # Check if a single top-level wrapper directory exists
+    subdirs = [p for p in download_path.iterdir() if p.is_dir() and not p.name.startswith(".")]
+    if len(subdirs) == 1 and subdirs[0].name.lower().startswith("cassava"):
+        return subdirs[0]
+
+    # Default to download root if classes are located directly at top-level
+    return download_path
 
 
 def copy_tree(source: Path, destination: Path) -> None:
-    # Replace stale dataset folders atomically from the caller's perspective.
+    """Replace stale dataset folders atomically from the caller's perspective."""
     if destination.exists():
         shutil.rmtree(destination)
     shutil.copytree(source, destination)
 
 
-def copy_metadata_files(download_path: Path, dataset_root: Path, datasets_dir: Path) -> None:
-    # Preserve Kaggle metadata when available so downstream audits can trace the data.
-    search_roots = [
-        download_path,
-        download_path / "PlantVillage",
-        dataset_root,
-        dataset_root.parent,
-    ]
-
+def copy_metadata_files(download_path: Path, datasets_dir: Path) -> None:
+    """Preserve Kaggle metadata files when available."""
     for file_name in METADATA_FILES:
-        for root in search_roots:
+        for root in [download_path, download_path.parent]:
             candidate = root / file_name
             if candidate.is_file():
                 shutil.copy2(candidate, datasets_dir / file_name)
@@ -71,30 +66,40 @@ def copy_metadata_files(download_path: Path, dataset_root: Path, datasets_dir: P
 
 
 def normalize_dataset(download_path: Path, project_root: Path) -> None:
-    # Move the Kaggle bundle into the repository contract consumed by the pipeline.
-    dataset_root = find_dataset_root(download_path)
+    """Move downloaded folders into datasets/raw and generate split sets."""
+    raw_source = find_raw_folder(download_path)
     datasets_dir = project_root / "datasets"
     raw_destination = datasets_dir / "raw"
     split_destination = datasets_dir / "split"
 
     datasets_dir.mkdir(parents=True, exist_ok=True)
 
-    print("[INFO] Normalizing dataset into datasets/raw and datasets/split...")
-    copy_tree(dataset_root / "raw", raw_destination)
+    print(f"[INFO] Copying class directories from {raw_source} to {raw_destination}...")
+    if raw_destination.exists():
+        shutil.rmtree(raw_destination)
+    raw_destination.mkdir(parents=True, exist_ok=True)
 
-    if (dataset_root / "split").is_dir():
-        copy_tree(dataset_root / "split", split_destination)
+    # Copy class folders into datasets/raw
+    for item in raw_source.iterdir():
+        if item.is_dir() and not item.name.startswith((".", "split")):
+            shutil.copytree(item, raw_destination / item.name)
+
+    # Split dataset using prepare_data.py if split folder does not exist
+    split_source = download_path / "split"
+    if split_source.is_dir():
+        print("[INFO] Found pre-existing split, copying...")
+        copy_tree(split_source, split_destination)
     else:
-        print("[WARN] Downloaded package does not include a prepared split.")
-        print("[INFO] Rebuilding split from raw images...")
+        print("[INFO] No prepared split found in Kaggle bundle.")
+        print("[INFO] Generating 80/10/10 train/val/test splits via scripts/prepare_data.py...")
         subprocess.run([sys.executable, "scripts/prepare_data.py"], check=True)
 
-    copy_metadata_files(download_path, dataset_root, datasets_dir)
+    copy_metadata_files(download_path, datasets_dir)
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Download the Kaggle PlantVillage dataset package."
+        description="Download the Kaggle Cassava Leaf Disease dataset package."
     )
     parser.add_argument("--dataset", default=DEFAULT_DATASET, help="Kaggle dataset handle.")
     parser.add_argument(
@@ -111,13 +116,12 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
-    # Keep setup idempotent unless the user explicitly requests a refresh.
     args = parse_args()
     project_root = Path.cwd().resolve()
 
     if dataset_ready(project_root) and not args.force:
         print(
-            "[INFO] PlantVillage dataset is already available under datasets/raw and datasets/split."
+            "[INFO] Cassava dataset is already available under datasets/raw and datasets/split."
         )
         return
 
