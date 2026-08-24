@@ -73,7 +73,12 @@ def _build_representative_dataset(config: dict) -> Callable[[], Iterator[list[tf
 
 def _validate_tflite_contract(model_path: Path, config: dict) -> None:
     # Print tensor types and shapes to catch accidental mobile contract drift.
-    interpreter = tf.lite.Interpreter(model_path=str(model_path))
+    # Disable the default XNNPACK delegate: on some Windows TensorFlow builds it
+    # fails to prepare MobileNetV3 INT8 graphs even when the .tflite file is valid.
+    interpreter = tf.lite.Interpreter(
+        model_path=str(model_path),
+        experimental_op_resolver_type=tf.lite.experimental.OpResolverType.BUILTIN_WITHOUT_DEFAULT_DELEGATES,
+    )
     interpreter.allocate_tensors()
     input_info = interpreter.get_input_details()[0]
     output_info = interpreter.get_output_details()[0]

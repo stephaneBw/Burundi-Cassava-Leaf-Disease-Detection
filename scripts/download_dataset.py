@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
+import stat
 import subprocess
 import sys
 from pathlib import Path
@@ -28,9 +30,20 @@ def dataset_ready(project_root: Path) -> bool:
     )
 
 
+def remove_readonly(func, path, excinfo):
+    """Force remove read-only attribute on Windows if deletion fails."""
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+
+def safe_rmtree(path: Path) -> None:
+    """Safely remove a directory tree on Windows."""
+    if path.exists():
+        shutil.rmtree(path, onerror=remove_readonly)
+
+
 def find_raw_folder(download_path: Path) -> Path:
     """Find the folder containing the 5 disease class subdirectories."""
-    # Check for explicit nested raw subfolders
     candidates = [
         download_path / "raw",
         download_path / "cassava-leaf-disease-classification",
@@ -39,19 +52,16 @@ def find_raw_folder(download_path: Path) -> Path:
         if candidate.is_dir():
             return candidate
 
-    # Check if a single top-level wrapper directory exists
     subdirs = [p for p in download_path.iterdir() if p.is_dir() and not p.name.startswith(".")]
     if len(subdirs) == 1 and subdirs[0].name.lower().startswith("cassava"):
         return subdirs[0]
 
-    # Default to download root if classes are located directly at top-level
     return download_path
 
 
 def copy_tree(source: Path, destination: Path) -> None:
-    """Replace stale dataset folders atomically from the caller's perspective."""
-    if destination.exists():
-        shutil.rmtree(destination)
+    """Replace stale dataset folders safely."""
+    safe_rmtree(destination)
     shutil.copytree(source, destination)
 
 
@@ -75,16 +85,13 @@ def normalize_dataset(download_path: Path, project_root: Path) -> None:
     datasets_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"[INFO] Copying class directories from {raw_source} to {raw_destination}...")
-    if raw_destination.exists():
-        shutil.rmtree(raw_destination)
+    safe_rmtree(raw_destination)
     raw_destination.mkdir(parents=True, exist_ok=True)
 
-    # Copy class folders into datasets/raw
     for item in raw_source.iterdir():
         if item.is_dir() and not item.name.startswith((".", "split")):
             shutil.copytree(item, raw_destination / item.name)
 
-    # Split dataset using prepare_data.py if split folder does not exist
     split_source = download_path / "split"
     if split_source.is_dir():
         print("[INFO] Found pre-existing split, copying...")
@@ -126,7 +133,6 @@ def main() -> None:
         return
 
     print(f"[INFO] Downloading Kaggle dataset with kagglehub: {args.dataset}")
-    print("[INFO] Kaggle credentials may be required for private or restricted datasets.")
     download_path = Path(
         kagglehub.dataset_download(args.dataset, output_dir=args.download_dir)
     ).resolve()
