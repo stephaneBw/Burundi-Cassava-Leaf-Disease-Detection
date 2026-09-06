@@ -1,5 +1,3 @@
-// Provides generated localization lookup and delegate wiring.
-
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';

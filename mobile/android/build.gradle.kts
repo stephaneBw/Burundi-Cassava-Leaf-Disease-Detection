@@ -1,5 +1,3 @@
-// Configures shared Android build repositories and cleanup behavior.
-
 allprojects {
     repositories {
         google()
@@ -7,9 +5,7 @@ allprojects {
     }
 }
 
-val newBuildDir: Directory = rootProject.layout.buildDirectory
-    .dir("../../build")
-    .get()
+val newBuildDir: Directory = rootProject.layout.buildDirectory.dir("../../build").get()
 rootProject.layout.buildDirectory.value(newBuildDir)
 
 subprojects {
@@ -17,8 +13,20 @@ subprojects {
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
 
+// Do NOT use evaluationDependsOn(":app") here: it evaluates projects early and
+// prevents afterEvaluate from aligning Java/Kotlin JVM targets in Flutter plugins.
 subprojects {
-    project.evaluationDependsOn(":app")
+    afterEvaluate {
+        tasks.withType<JavaCompile>().configureEach {
+            sourceCompatibility = JavaVersion.VERSION_17.toString()
+            targetCompatibility = JavaVersion.VERSION_17.toString()
+        }
+        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+            compilerOptions {
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+            }
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {

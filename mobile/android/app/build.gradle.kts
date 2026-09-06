@@ -1,5 +1,6 @@
 // Configures the Android application build, signing, and Flutter integration.
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
 plugins {
@@ -16,16 +17,13 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.greenhealer.mobile"
-    compileSdk = flutter.compileSdkVersion
+    // Some plugins require a higher compileSdk (permission_handler requires 37). Set to 37.
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     defaultConfig {
@@ -55,10 +53,16 @@ android {
         }
     }
 
-    aaptOptions {
+    androidResources {
         noCompress += "tflite"
     }
 }
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
+    }
 
 flutter {
     source = "../.."
