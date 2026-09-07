@@ -128,7 +128,7 @@ Connect your physical Android smartphone (e.g., Pixel 7a) with USB Debugging ena
 
 ## Acknowledgments & Attribution
 
-* **Original Project Basis:** This project builds upon and extends the architectural foundation of the **[GreenHealer](https://www.google.com/url?sa=E&source=gmail&q=https://github.com/original-author/GreenHealer)** project, adapting its mobile edge AI vision for localized cassava crop pathologies and offline agronomic deployment in Burundi.
+* **Original Project Basis:** This project builds upon and extends the architectural foundation of the **GreenHealer** project, adapting its mobile edge AI vision for localized cassava crop pathologies and offline agronomic deployment in Burundi.
 * **Dataset Provenance:** The cassava disease image collection originates from the **Makerere University AI Lab** in collaboration with Uganda's **National Crops Resources Research Institute (NaCRRI)** (Mwebaze et al., 2019), made available via the Kaggle Cassava Leaf Disease Classification challenge under the CC BY 4.0 license.
 
 
